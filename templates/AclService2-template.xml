@@ -1,0 +1,107 @@
+<config-template xmlns="http://tail-f.com/ns/config/1.0">
+  <devices xmlns="http://tail-f.com/ns/ncs">
+    <device>
+      <name>{$DEVICE}</name>
+      <config>
+        <!-- JUNOS -->
+        <configuration xmlns="http://xml.juniper.net/xnm/1.1/xnm">
+          <interfaces>
+            <interface>
+              <name>xe-0/0/{$INTERFACE_ID}</name>
+              <unit>
+                <name>0</name>
+                <family>
+                  <inet>
+                    <simple-filter>
+                      <input>{$ACL_NAME}</input>
+                    </simple-filter>
+                    <address>
+                      <name>{$INTERFACE_IP}/24</name>
+                    </address>
+                  </inet>
+                </family>
+              </unit>
+            </interface>
+          </interfaces>
+          <firewall>
+            <family>
+              <inet>
+                <simple-filter>
+                  <name>{$ACL_NAME}</name>
+                  <term>
+                    <name>{$ACL_LINE}</name>
+                    <from>
+                      <source-address>
+                        <address>{$ACL_SUBNET_ADDRESS}/16</address>
+                      </source-address>
+                    </from>
+                  </term>
+                </simple-filter>
+              </inet>
+            </family>
+          </firewall>
+        </configuration>
+
+        <!-- IOS-XR -->
+        <ipv4 xmlns="http://tail-f.com/ned/cisco-ios-xr">
+          <access-list>
+            <named-acl>
+              <name>{$ACL_NAME}</name>
+              <rule>
+                <id>{$ACL_LINE}</id>
+                <line>permit {$ACL_SUBNET_ADDRESS} 0.0.255.255</line>
+              </rule>
+            </named-acl>
+          </access-list>
+        </ipv4>
+        <interface xmlns="http://tail-f.com/ned/cisco-ios-xr">
+          <GigabitEthernet>
+            <id>0/{$INTERFACE_ID}</id>
+            <ipv4>
+              <address>
+                <ip>{$INTERFACE_IP}</ip>
+                <mask>255.255.255.0</mask>
+              </address>
+              <access-group>
+                <direction>ingress</direction>
+                <name>{$ACL_NAME}</name>
+              </access-group>
+            </ipv4>
+          </GigabitEthernet>
+        </interface>
+
+        <!-- IOS -->
+        <ip xmlns="urn:ios">
+          <access-list>
+            <standard>
+              <std-named-acl>
+                <name>{$ACL_NAME}</name>
+                <std-access-list-rule>
+                  <rule>permit {$ACL_SUBNET_ADDRESS} 0.0.255.255</rule>
+                </std-access-list-rule>
+              </std-named-acl>
+            </standard>
+          </access-list>
+        </ip>
+        <interface xmlns="urn:ios">
+          <GigabitEthernet>
+            <name>0/{$INTERFACE_ID}</name>
+            <ip>
+              <access-group>
+                <direction>in</direction>
+                <access-list>{$ACL_NAME}</access-list>
+              </access-group>
+              <address>
+                <primary>
+                  <address>{$INTERFACE_IP}</address>
+                  <mask>255.255.255.0</mask>
+                </primary>
+              </address>
+            </ip>
+          </GigabitEthernet>
+        </interface>
+
+      </config>
+    </device>
+  </devices>
+</config-template>
