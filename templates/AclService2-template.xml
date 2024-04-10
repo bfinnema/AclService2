@@ -42,7 +42,7 @@
           </firewall>
         </configuration>
 
-        <!-- IOS-XR -->
+        <!-- IOS-XR CLI NED -->
         <ipv4 xmlns="http://tail-f.com/ned/cisco-ios-xr">
           <access-list>
             <named-acl>
@@ -69,6 +69,50 @@
             </ipv4>
           </GigabitEthernet>
         </interface>
+
+        <!-- IOS-XR NETCONF -->
+        <ipv4 xmlns="http://cisco.com/ns/yang/Cisco-IOS-XR-um-ipv4-access-list-cfg">
+          <access-lists>
+            <access-list>
+              <access-list-name>{$ACL_NAME}</access-list-name>
+              <sequences>
+                <sequence>
+                  <sequence-number>{$ACL_LINE}</sequence-number>
+                  <permit>
+                    <protocol>ipv4</protocol>
+                    <source>
+                      <address>{$ACL_SUBNET_ADDRESS}</address>
+                      <prefix-length>16</prefix-length>
+                    </source>
+                    <destination>
+                      <any/>
+                    </destination>
+                  </permit>
+                </sequence>
+              </sequences>
+            </access-list>
+          </access-lists>
+        </ipv4>
+        <interfaces xmlns="http://cisco.com/ns/yang/Cisco-IOS-XR-um-interface-cfg">
+          <interface>
+            <interface-name>GigabitEthernet0/{$INTERFACE_ID}</interface-name>
+            <ipv4>
+              <access-group xmlns="http://cisco.com/ns/yang/Cisco-IOS-XR-um-if-access-group-cfg">
+                <ingress>
+                  <access-list-name-1>
+                    <name>{$ACL_NAME}</name>
+                  </access-list-name-1>
+                </ingress>
+              </access-group>
+              <addresses xmlns="http://cisco.com/ns/yang/Cisco-IOS-XR-um-if-ip-address-cfg">
+                <address>
+                  <address>{$INTERFACE_IP}</address>
+                  <netmask>255.255.255.0</netmask>
+                </address>
+              </addresses>
+            </ipv4>
+          </interface>
+        </interfaces>
 
         <!-- IOS -->
         <ip xmlns="urn:ios">
