@@ -11,7 +11,7 @@
               <unit>
                 <name>0</name>
                 <family>
-                  <inet>
+                  <inet tags="replace">
                     <simple-filter>
                       <input>{$ACL_NAME}</input>
                     </simple-filter>
